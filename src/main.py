@@ -13,6 +13,8 @@ def get_pixels(filename):
         pixel_cols.append([])
         for j in xrange(height):
             value = pixels[j * width + i][0]
+            # change as necessary to support different effects
+            # for different colors
             if value == 255:
                 pixel_cols[i].append(0)
             else:
@@ -48,8 +50,10 @@ def convert_to_music(pixels):
     height = len(pixels[0])
     for i in xrange(width):
         for j in xrange(height):
-            temp = 0
+            # check to make sure note is not already accounted for
             if pixels[i][j] == 1 and not (i > 0 and pixels[i-1][j] == 1):
+                # extend duration as necessary
+                temp = 0
                 while i + temp + 1 < width and pixels[i + temp + 1][j] == 1:
                     temp += 1
                 MyMIDI.addNote(0, 0, 100 - j, time, duration * (1 + temp), 100)
@@ -62,7 +66,7 @@ def main():
     midi = convert_to_music(pixels)
     binfile = open("output2.mid", 'wb')
     midi.writeFile(binfile)
-    binfile.close()
+    binfile.close() # no idea if this is necessary or not
     webbrowser.open('output2.mid')
 
 main()
