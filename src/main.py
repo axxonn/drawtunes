@@ -62,11 +62,12 @@ def convert_to_music(pixels):
     return MyMIDI
 
 def main():
-    pixels = get_pixels('input.png')
+    filename = raw_input('Please enter the name of your image file (don\'t include .png): ')
+    pixels = get_pixels(filename + '.png')
     midi = convert_to_music(pixels)
-    binfile = open("output2.mid", 'wb')
+    binfile = open(filename + ".mid", 'wb')
     midi.writeFile(binfile)
     binfile.close() # no idea if this is necessary or not
-    webbrowser.open('output2.mid')
+    webbrowser.open(filename + '.mid')
 
 main()
