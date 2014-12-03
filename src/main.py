@@ -93,15 +93,6 @@ def create_masterlist(color, pixellist):
 
 
 def main():
-<<<<<<< HEAD
-    filename = 'input'
-    pixels = get_pixels(filename + '.png')
-    midi = convert_to_music(pixels)
-    binfile = open(filename + ".mid", 'wb')
-    midi.writeFile(binfile)
-    binfile.close() # no idea if this is necessary or not
-    webbrowser.open(filename + '.mid')
-=======
     filename = raw_input('Please enter the name of your image file (don\'t include .png): ')
     pixels = get_pixels(filename + '.png')
     colors = get_colors(pixels)
@@ -112,6 +103,5 @@ def main():
         midi.writeFile(binfile)
     binfile.close() # no idea if this is necessary or not
     #webbrowser.open(filename + '.mid')
->>>>>>> ada3b5d02674d7efbaa5d976b229bcd54e3ab5c9
 
 main()
