@@ -16,13 +16,6 @@ def get_pixels(filename):
         for j in xrange(height):
             value = pixels[j * width + i]
             pixel_cols[i].append(value)
-            # value = pixels[j * width + i][0]
-            # # change as necessary to support different effects
-            # # for different colors
-            # if value == 255:
-            #     pixel_cols[i].append(0)
-            # else:
-            #     pixel_cols[i].append(1)
     
     # for i in xrange(len(pixel_cols)):
     #    for j in xrange(len(pixel_cols[0])):
@@ -31,24 +24,18 @@ def get_pixels(filename):
     
     return pixel_cols
 
-def convert_to_music(pixels):
-    # Create the MIDIFile Object with 1 track
-    MyMIDI = MIDIFile(1)
+def convert_to_music(midi, pixels, track, length = 0.5):
+    MyMIDI = midi
     
     # Tracks are numbered from zero. Times are measured in beats.
-    track = 0   
+    #track = 0   
     time = 0
     
     # Add track name and tempo.
-    MyMIDI.addTrackName(track,time,"Sample Track")
+    #MyMIDI.addTrackName(track,time,"Sample Track")
     MyMIDI.addTempo(track,time,120)
     
-    track = 0
-    channel = 1
-    pitch = 0
-    time = 0
-    duration = 0.1
-    volume = 100
+    duration = length
     
     width = len(pixels)
     height = len(pixels[0])
@@ -60,10 +47,11 @@ def convert_to_music(pixels):
                 temp = 0
                 while i + temp + 1 < width and pixels[i + temp + 1][j] == 1:
                     temp += 1
-                MyMIDI.addNote(0, 0, 100 - j, time, duration * (1 + temp), 100)
+                # parameters: track, channel, pitch, time, duration, volume
+                MyMIDI.addNote(track, track, 100 - j, time, duration * (1 + temp), 100)
         time += duration
     
-    return MyMIDI
+    #return MyMIDI
 
 
 def get_colors(pixellist):
@@ -72,7 +60,7 @@ def get_colors(pixellist):
     colorlist = {}
     for column in pixellist:
         for pixelcolor in column:
-            if not pixelcolor in colorlist and pixelcolor != (255, 255, 255):
+            if not pixelcolor in colorlist and pixelcolor[:3] != (255, 255, 255) :
                 colorlist[pixelcolor] = 0
     return colorlist
 
@@ -96,11 +84,17 @@ def main():
     filename = raw_input('Please enter the name of your image file (don\'t include .png): ')
     pixels = get_pixels(filename + '.png')
     colors = get_colors(pixels)
+    print colors
+    track = 0
+    # Create the MIDIFile Object with 1 track
+    midi = MIDIFile(len(colors))
     for color in colors:
+        midi.addProgramChange(track, track, 0, track * 15)
         colors[color] = create_masterlist(color, pixels)
-        midi = convert_to_music(colors[color])
-        binfile = open(filename + '_' + `color` + ".mid", 'wb')
-        midi.writeFile(binfile)
+        convert_to_music(midi, colors[color], track)
+        track += 1
+    binfile = open(filename + 'v2' + ".mid", 'wb')
+    midi.writeFile(binfile)
     binfile.close() # no idea if this is necessary or not
     #webbrowser.open(filename + '.mid')
 
