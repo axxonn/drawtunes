@@ -24,10 +24,10 @@ def get_pixels(filename):
             # else:
             #     pixel_cols[i].append(1)
     
-    for i in xrange(len(pixel_cols)):
-       for j in xrange(len(pixel_cols[0])):
-           print pixel_cols[i][j],
-       print '\n'
+    # for i in xrange(len(pixel_cols)):
+    #    for j in xrange(len(pixel_cols[0])):
+    #        print pixel_cols[i][j],
+    #    print '\n'
     
     return pixel_cols
 
@@ -67,31 +67,41 @@ def convert_to_music(pixels):
 
 
 def get_colors(pixellist):
-    """Returns: a list of colors from an array of RBG values that correspond with pixels
+    """Returns: a dictionary of colors (key is tuple that represents RGB values, value is int 0)
     Precondition: pixellist is a 2D list containing tuples that correspond to RGB values"""
-    pass
+    colorlist = {}
+    for column in pixellist:
+        for pixelcolor in column:
+            if not pixelcolor in colorlist and pixelcolor != (255, 255, 255):
+                colorlist[pixelcolor] = 0
+    return colorlist
 
 
-
-def create_masterlist(colorlist, pixellist):
-    """Returns: a list of 2D lists, each of which contains information for one color
-    Precondition: colorlist is a list of colors """
-    # loop through colorlist
-    # for each color, loop through file
-        # append to masterlist
-    pass
-
+def create_masterlist(color, pixellist):
+    """Returns: a 2D list which contains 1 or 0 depending on if that color is at that pixel
+    Precondition: color is a tuple of RGB values, pixellist is a 2D list of tuples"""
+    masterlist = []
+    for column in pixellist:
+        columnlist = []
+        for row in column:
+            if row == color:
+                columnlist.append(1)
+            else:
+                columnlist.append(0)
+        masterlist.append(columnlist)
+    return masterlist
 
 
 def main():
     filename = raw_input('Please enter the name of your image file (don\'t include .png): ')
     pixels = get_pixels(filename + '.png')
     colors = get_colors(pixels)
-    masterlist = create_masterlist(colors, pixels) # list of 2D lists which contain 
-    midi = convert_to_music(pixels)
-    binfile = open(filename + ".mid", 'wb')
-    midi.writeFile(binfile)
+    for color in colors:
+        colors[color] = create_masterlist(color, pixels)
+        midi = convert_to_music(colors[color])
+        binfile = open(filename + '_' + `color` + ".mid", 'wb')
+        midi.writeFile(binfile)
     binfile.close() # no idea if this is necessary or not
-    webbrowser.open(filename + '.mid')
+    #webbrowser.open(filename + '.mid')
 
 main()
