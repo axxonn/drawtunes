@@ -1,3 +1,4 @@
+import sys
 from PIL import Image
 from midiutil.MidiFile import MIDIFile
 import webbrowser
@@ -25,6 +26,8 @@ def get_pixels(filename):
     return pixel_cols
 
 def convert_to_music(midi, pixels, track, length = 0.5):
+    """Writes the given pixels to the midi on the given track.
+    #May specify duration of notes."""
     MyMIDI = midi
     
     # Tracks are numbered from zero. Times are measured in beats.
@@ -84,6 +87,11 @@ def main():
     filename = raw_input('Please enter the name of your image file (don\'t include .png): ')
     pixels = get_pixels(filename + '.png')
     colors = get_colors(pixels)
+    while len(colors) > 15:
+        sys.stdout.write('This image has too many colors.')
+        filename = raw_input('Please enter the name of your image file (don\'t include .png): ')
+        pixels = get_pixels(filename + '.png')
+        colors = get_colors(pixels)
     print colors
     track = 0
     # Create the MIDIFile Object with 1 track
@@ -93,9 +101,10 @@ def main():
         colors[color] = create_masterlist(color, pixels)
         convert_to_music(midi, colors[color], track)
         track += 1
-    binfile = open(filename + 'v2' + ".mid", 'wb')
+    binfile = open(filename + ".mid", 'wb')
     midi.writeFile(binfile)
     binfile.close() # no idea if this is necessary or not
-    #webbrowser.open(filename + '.mid')
+    webbrowser.open(filename + '.mid')
 
-main()
+if __name__ == '__main__':
+    main()
