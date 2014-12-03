@@ -4,7 +4,7 @@ from midiutil.MidiFile import MIDIFile
 import webbrowser
 
 def get_pixels(filename):
-    """Returns: a 2D list that contains the RGB values of each pixel, represented as a tuple
+    """Returns: a 2D list that contains ints (that represent hue)
     Precondition: filename is a string that corresponds to a png file"""
     im = Image.open(filename)
     
@@ -58,8 +58,8 @@ def convert_to_music(midi, pixels, track, length = 0.5):
 
 
 def get_colors(pixellist):
-    """Returns: a dictionary of colors (key is tuple that represents RGB values, value is int 0)
-    Precondition: pixellist is a 2D list containing tuples that correspond to RGB values"""
+    """Returns: a dictionary of colors (key is the color)
+    Precondition: pixellist is a 2D list containing tuples (RGB values)"""
     colorlist = {}
     for column in pixellist:
         for pixelcolor in column:
@@ -70,7 +70,7 @@ def get_colors(pixellist):
 
 def create_masterlist(color, pixellist):
     """Returns: a 2D list which contains 1 or 0 depending on if that color is at that pixel
-    Precondition: color is a tuple of RGB values, pixellist is a 2D list of tuples"""
+    Precondition: color is a tuple of RGB values, pixellist is a 2D list of tuples (RGB values)"""
     masterlist = []
     for column in pixellist:
         columnlist = []
@@ -81,6 +81,27 @@ def create_masterlist(color, pixellist):
                 columnlist.append(0)
         masterlist.append(columnlist)
     return masterlist
+
+
+def rgb_to_hue(color):
+    """Returns: float that represents the hue
+    Preconditions: color is a tuple that contains RGB values"""
+    red = color[0] / 255.0
+    green = color[1] / 255.0
+    blue = color[2] / 255.0
+    maxValue = max(red, green, blue)
+    minValue = min(red, green, blue)
+    if maxValue == minValue:
+       hue = 0
+    elif maxValue == red and green >= blue:
+       hue = 60.0 * (green - blue)/(maxValue - minValue)
+    elif maxValue == red and green < blue:
+       hue = 60.0 * (green - blue)/(maxValue - minValue) + 360.0
+    elif maxValue == green:
+       hue = 60.0 * (blue - red)/(maxValue - minValue) + 120.0
+    elif maxValue == blue:
+       hue = 60.0 * (red - green)/(maxValue - minValue) + 240.0
+    return hue
 
 
 def main():
