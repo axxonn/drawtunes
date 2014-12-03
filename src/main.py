@@ -3,6 +3,8 @@ from midiutil.MidiFile import MIDIFile
 import webbrowser
 
 def get_pixels(filename):
+    """Returns: a 2D list that contains the RGB values of each pixel, represented as a tuple
+    Precondition: filename is a string that corresponds to a png file"""
     im = Image.open(filename)
     
     pixels = list(im.getdata())
@@ -12,18 +14,20 @@ def get_pixels(filename):
     for i in xrange(width):
         pixel_cols.append([])
         for j in xrange(height):
-            value = pixels[j * width + i][0]
-            # change as necessary to support different effects
-            # for different colors
-            if value == 255:
-                pixel_cols[i].append(0)
-            else:
-                pixel_cols[i].append(1)
+            value = pixels[j * width + i]
+            pixel_cols[i].append(value)
+            # value = pixels[j * width + i][0]
+            # # change as necessary to support different effects
+            # # for different colors
+            # if value == 255:
+            #     pixel_cols[i].append(0)
+            # else:
+            #     pixel_cols[i].append(1)
     
-    #for i in xrange(len(pixel_cols)):
-    #    for j in xrange(len(pixel_cols[0])):
-    #        print pixel_cols[i][j],
-    #    print '\n'
+    for i in xrange(len(pixel_cols)):
+       for j in xrange(len(pixel_cols[0])):
+           print pixel_cols[i][j],
+       print '\n'
     
     return pixel_cols
 
@@ -61,9 +65,29 @@ def convert_to_music(pixels):
     
     return MyMIDI
 
+
+def get_colors(pixellist):
+    """Returns: a list of colors from an array of RBG values that correspond with pixels
+    Precondition: pixellist is a 2D list containing tuples that correspond to RGB values"""
+    pass
+
+
+
+def create_masterlist(colorlist, pixellist):
+    """Returns: a list of 2D lists, each of which contains information for one color
+    Precondition: colorlist is a list of colors """
+    # loop through colorlist
+    # for each color, loop through file
+        # append to masterlist
+    pass
+
+
+
 def main():
     filename = raw_input('Please enter the name of your image file (don\'t include .png): ')
     pixels = get_pixels(filename + '.png')
+    colors = get_colors(pixels)
+    masterlist = create_masterlist(colors, pixels) # list of 2D lists which contain 
     midi = convert_to_music(pixels)
     binfile = open(filename + ".mid", 'wb')
     midi.writeFile(binfile)
