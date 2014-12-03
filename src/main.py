@@ -118,7 +118,8 @@ def main():
     # Create the MIDIFile Object with 1 track
     midi = MIDIFile(len(colors))
     for color in colors:
-        midi.addProgramChange(track, track, 0, track * 15)
+        instrument = int((color[0]*100+color[1]*10+color[2]) / (28305/127))
+        midi.addProgramChange(track, track, 0, instrument)
         colors[color] = create_masterlist(color, pixels)
         convert_to_music(midi, colors[color], track)
         track += 1
