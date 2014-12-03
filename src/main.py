@@ -20,10 +20,10 @@ def get_pixels(filename):
             else:
                 pixel_cols[i].append(1)
     
-    #for i in xrange(len(pixel_cols)):
-    #    for j in xrange(len(pixel_cols[0])):
-    #        print pixel_cols[i][j],
-    #    print '\n'
+    for i in xrange(len(pixel_cols)):
+        for j in xrange(len(pixel_cols[0])):
+            print pixel_cols[i][j],
+        print '\n'
     
     return pixel_cols
 
@@ -40,10 +40,10 @@ def convert_to_music(pixels):
     MyMIDI.addTempo(track,time,120)
     
     track = 0
-    channel = 0
+    channel = 1
     pitch = 0
     time = 0
-    duration = 0.5
+    duration = 0.1
     volume = 100
     
     width = len(pixels)
@@ -62,11 +62,12 @@ def convert_to_music(pixels):
     return MyMIDI
 
 def main():
-    pixels = get_pixels('input.png')
+    filename = 'input'
+    pixels = get_pixels(filename + '.png')
     midi = convert_to_music(pixels)
-    binfile = open("output2.mid", 'wb')
+    binfile = open(filename + ".mid", 'wb')
     midi.writeFile(binfile)
     binfile.close() # no idea if this is necessary or not
-    webbrowser.open('output2.mid')
+    webbrowser.open(filename + '.mid')
 
 main()
