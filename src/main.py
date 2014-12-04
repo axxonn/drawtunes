@@ -4,7 +4,7 @@ from midiutil.MidiFile import MIDIFile
 import webbrowser
 
 def get_pixels(filename):
-    """Returns: a 2D list that contains ints (that represent hue)
+    """Returns: a 2D list that contains tuples (RBG values)
     Precondition: filename is a string that corresponds to a png file"""
     im = Image.open(filename)
     
@@ -104,15 +104,34 @@ def rgb_to_hue(color):
     return hue
 
 
+def normalize_height(pixellist):
+    """Returns: a 2D list of height 88 that contains tuples (RGB values)
+    Precondition: pixellist is a 2D list of random height and width"""
+    newpixellist = []
+    for column in range(len(pixellist)): 
+        newcolumn = []
+        for row in range(88): # creates columns of 88 white pixels
+            newcolumn.append((255, 255, 255)) # appends a white pixel
+        newpixellist.append(newcolumn) # adds column to new 2D list
+    for column in range(len(pixellist)):
+        for row in range(len(pixellist[column])):
+            if pixellist[column][row][:3] != (255, 255, 255): 
+                height = int((row*1.0)/len(pixellist[column]) * 88)
+                newpixellist[column][height] = pixellist[column][row] 
+    return newpixellist
+
+
 def main():
     filename = raw_input('Please enter the name of your image file (don\'t include .png): ')
     pixels = get_pixels(filename + '.png')
-    colors = get_colors(pixels)
+    pixels88 = normalize_height(pixels)
+    colors = get_colors(pixels88)
     while len(colors) > 15:
         sys.stdout.write('This image has too many colors.')
         filename = raw_input('Please enter the name of your image file (don\'t include .png): ')
         pixels = get_pixels(filename + '.png')
-        colors = get_colors(pixels)
+        pixels88 = normalize_height(pixels)
+        colors = get_colors(pixels88)
     print colors
     track = 0
     # Create the MIDIFile Object with 1 track
@@ -120,7 +139,7 @@ def main():
     for color in colors:
         instrument = int((color[0]*100+color[1]*10+color[2]) / (28305/127))
         midi.addProgramChange(track, track, 0, instrument)
-        colors[color] = create_masterlist(color, pixels)
+        colors[color] = create_masterlist(color, pixels88)
         convert_to_music(midi, colors[color], track)
         track += 1
     binfile = open(filename + ".mid", 'wb')
