@@ -25,7 +25,7 @@ def get_pixels(filename):
     
     return pixel_cols
 
-def convert_to_music(midi, pixels, track, length = 0.5):
+def convert_to_music(midi, pixels, track, tempo = 120):
     """Writes the given pixels to the midi on the given track.
     #May specify duration of notes."""
     MyMIDI = midi
@@ -36,9 +36,9 @@ def convert_to_music(midi, pixels, track, length = 0.5):
     
     # Add track name and tempo.
     #MyMIDI.addTrackName(track,time,"Sample Track")
-    MyMIDI.addTempo(track,time,120)
+    MyMIDI.addTempo(track,time,tempo)
     
-    duration = length
+    duration = 0.5
     
     width = len(pixels)
     height = len(pixels[0])
@@ -63,7 +63,7 @@ def get_colors(pixellist):
     colorlist = {}
     for column in pixellist:
         for pixelcolor in column:
-            if not pixelcolor in colorlist and pixelcolor[:3] != (255, 255, 255) :
+            if pixelcolor[:3] != (255, 255, 255) and not pixelcolor in colorlist:
                 colorlist[pixelcolor] = 0
     return colorlist
 
