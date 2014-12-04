@@ -25,7 +25,7 @@ def get_pixels(filename):
     
     return pixel_cols
 
-def convert_to_music(midi, pixels, track, tempo = 120):
+def convert_to_music(midi, pixels, instrument, tempo = 120):
     """Writes the given pixels to the midi on the given track.
     #May specify duration of notes."""
     MyMIDI = midi
@@ -36,7 +36,7 @@ def convert_to_music(midi, pixels, track, tempo = 120):
     
     # Add track name and tempo.
     #MyMIDI.addTrackName(track,time,"Sample Track")
-    MyMIDI.addTempo(track,time,tempo)
+    MyMIDI.addTempo(instrument,time,tempo)
     
     duration = 0.5
     
@@ -50,8 +50,9 @@ def convert_to_music(midi, pixels, track, tempo = 120):
                 temp = 0
                 while i + temp + 1 < width and pixels[i + temp + 1][j] == 1:
                     temp += 1
+                pitch = int((height-j)/float(height) * 88) + 21
                 # parameters: track, channel, pitch, time, duration, volume
-                MyMIDI.addNote(track, track, 100 - j, time, duration * (1 + temp), 100)
+                MyMIDI.addNote(instrument, instrument, pitch, time, duration * (1 + temp), 100)
         time += duration
     
     #return MyMIDI
