@@ -76,9 +76,10 @@ def normalize_height(pixellist):
 
 def fix_chords(pixel88list):
     """Returns: a beautiful version of pixel88list. Notes are shifted so that they do not clash within chords."""
+    # This implementation is slightly inefficient in that it redundantly checks some known whitespaces for clashes
+    # after shifting a note, but we keep it to simplify the loop mechanics.
     for column in range(len(pixel88list)):
         notes = {} # set of pitches in a given column
-        #for row in xrange(len(pixel88list[column]))[1:]: # [1:] because only need to start checking on second note
         for row in range(len(pixel88list[column]))[:-1]:
             pixel = pixel88list[column][row][:3]
             if pixel != (255, 255, 255):
@@ -87,7 +88,7 @@ def fix_chords(pixel88list):
                 for i in notes:
                     while is_clashing(i, pitch):
                         if index + 1 >= len(pixel88list[column]):
-                            print 'oh no'
+                            # print 'oh no'
                             break
                         pitch -= 1
                         pixel88list[column][index+1] = pixel
@@ -96,29 +97,11 @@ def fix_chords(pixel88list):
                 notes[pitch] = 0  # 0 is placeholder value, just need key
     return pixel88list
 
-
-        # for row in reversed(xrange(len(pixel88list[column]))):
-        #     pixel = pixel88list[column][row][:3]
-        #     if pixel != (255, 255, 255):
-        #         resolved = False
-        #         while not resolved:
-        #             resolved = True
-        #             for i in xrange(len(pixel88list[column])):
-        #                 if pixel88list[column][i][:3] != (255, 255, 255) and is_clashing(row, i):
-        #                     pixel88list[column][row] = (255, 255, 255)
-        #                     resolved = False
-
 def is_clashing(note1, note2):
     """Returns: whether note1 and note2 clash, i.e. whether they are one or two half-steps away from each other
     Precondition: note1, note2 are pitches, 0-88 (correspond to piano keyboard)"""
     distance = min((note1-note2)%12,(note2-note1)%12)
-    return 0 < distance < 3
-    # dist1 = (given-shifter)%12
-    # if 0 < dist1 < 3:
-    #     return -(3-dist1)
-    # dist2 = (shifter-given)%12
-    # if 0 < dist2 < 3:
-    #     return 3-dist2
+    return 0 < distance < 3  # 1 or 2 half-steps
 
 
 def get_colors(pixellist):
@@ -127,8 +110,9 @@ def get_colors(pixellist):
     colorlist = {}
     for column in pixellist:
         for pixelcolor in column:
-            if pixelcolor[:3] != (255, 255, 255) and not pixelcolor in colorlist:
-                colorlist[pixelcolor] = 0
+            pixelcolor3 = pixelcolor[:3]
+            if pixelcolor3 != (255, 255, 255) and not pixelcolor3 in colorlist:
+                colorlist[pixelcolor3] = 0
     return colorlist
 
 
@@ -180,14 +164,13 @@ def main():
         pixels = get_pixels(filename + '.png')
         pixels88 = normalize_height(pixels)
         colors = get_colors(pixels88)
-    track = 0
-    # Create the MIDIFile Object with 1 track
     midi = MIDIFile(len(colors))
+    track = 0
     for color in colors:
         instrument = int((color[0]*100+color[1]*10+color[2]) / (28305/127))
         midi.addProgramChange(track, track, 0, instrument)
         colors[color] = create_masterlist(color, pixels88)
-        convert_to_music(midi, colors[color], track, tempo = 240)
+        convert_to_music(midi, colors[color], track, tempo=240)
         track += 1
         print `color` + ': ' + `instrument`
     filename = 'beautiful_' + filename
