@@ -189,12 +189,12 @@ def main():
         colors[color] = create_masterlist(color, pixels88)
         convert_to_music(midi, colors[color], track, tempo=240)
         track += 1
-        print `color` + ': ' + `instrument`
+        #print `color` + ': ' + `instrument`
     filename = 'beautiful_' + filename
     binfile = open(filename + ".mid", 'wb')
     midi.writeFile(binfile)
-    binfile.close()  # no idea if this is necessary or not
-    webbrowser.open(filename + '.mid')
+    binfile.close() # no idea if this is necessary or not
+    #webbrowser.open(filename + '.mid')
 
 if __name__ == '__main__':
     main()
