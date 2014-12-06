@@ -1,7 +1,9 @@
 import sys
+import os
+import webbrowser
+import argparse
 from PIL import Image
 from midiutil.MidiFile import MIDIFile
-import webbrowser
 
 def get_pixels(filename):
     """Returns: a 2D list that contains tuples (RBG values)
@@ -151,19 +153,34 @@ def rgb_to_hue(color):
        hue = 60.0 * (red - green)/(maxValue - minValue) + 240.0
     return hue
 
+class ColorException(Exception):
+    pass
 
 def main():
-    filename = raw_input('Please enter the name of your image file (don\'t include .png): ')
-    pixels = get_pixels(filename + '.png')
-    pixels88 = normalize_height(pixels)
-    pixels88 = fix_chords(pixels88)
-    colors = get_colors(pixels88)
-    while len(colors) > 15:
-        sys.stdout.write('This image has too many colors. ')
-        filename = raw_input('Please enter the name of your image file (don\'t include .png): ')
-        pixels = get_pixels(filename + '.png')
-        pixels88 = normalize_height(pixels)
-        colors = get_colors(pixels88)
+    os.chdir(os.getcwd() + '\\..\\sandbox')  # first requires working directory to be "../final"
+    parser = argparse.ArgumentParser()
+    parser.add_argument('filename', help='the name of the image file')
+    args = parser.parse_args()
+    filename = args.filename
+    while filename != 'quit()':
+        try:
+            pixels = get_pixels(filename + '.png')
+            pixels88 = normalize_height(pixels)
+            colors = get_colors(pixels88)
+            if len(colors) > 15:
+                raise ColorException()
+            break
+        except IOError:
+            print 'File not found. Please enter a valid filename.'
+            filename = raw_input(
+                'Please enter the name of your image file (don\'t include .png) \nor type \'quit()\' to quit: ')
+        except ColorException:
+            print 'This image has too many colors.'
+            filename = raw_input(
+                'Please enter the name of your image file (don\'t include .png) \nor type \'quit()\' to quit: ')
+    if filename == 'quit()':
+        return
+
     midi = MIDIFile(len(colors))
     track = 0
     for color in colors:
@@ -176,7 +193,7 @@ def main():
     filename = 'beautiful_' + filename
     binfile = open(filename + ".mid", 'wb')
     midi.writeFile(binfile)
-    binfile.close() # no idea if this is necessary or not
+    binfile.close()  # no idea if this is necessary or not
     webbrowser.open(filename + '.mid')
 
 if __name__ == '__main__':
