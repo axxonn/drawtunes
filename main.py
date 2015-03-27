@@ -157,27 +157,29 @@ class ColorException(Exception):
     pass
 
 def main():
-    os.chdir(os.getcwd() + '\\..\\sandbox')  # first requires working directory to be "../final"
+    prefix = os.getcwd() + '\\samples\\'
     parser = argparse.ArgumentParser()
     parser.add_argument('filename', help='the name of the image file')
     args = parser.parse_args()
     filename = args.filename
     while filename != 'quit()':
         try:
-            pixels = get_pixels(filename + '.png')
+            filename = prefix + filename
+            pixels = get_pixels(filename)
             pixels88 = normalize_height(pixels)
             colors = get_colors(pixels88)
+            print colors
             if len(colors) > 15:
                 raise ColorException()
             break
         except IOError:
             print 'File not found. Please enter a valid filename.'
             filename = raw_input(
-                'Please enter the name of your image file (don\'t include .png) \nor type \'quit()\' to quit: ')
+                'Please enter the name of your image file (or type \'quit()\' to quit):\n')
         except ColorException:
             print 'This image has too many colors.'
             filename = raw_input(
-                'Please enter the name of your image file (don\'t include .png) \nor type \'quit()\' to quit: ')
+                'Please enter the name of your image file (or type \'quit()\' to quit):\n')
     if filename == 'quit()':
         return
 
@@ -190,7 +192,8 @@ def main():
         convert_to_music(midi, colors[color], track, tempo=240)
         track += 1
         #print `color` + ': ' + `instrument`
-    filename = 'beautiful_' + filename
+    # filename = 'beautiful_' + filename
+    filename = filename.split('.')[0]
     binfile = open(filename + ".mid", 'wb')
     midi.writeFile(binfile)
     binfile.close() # no idea if this is necessary or not
